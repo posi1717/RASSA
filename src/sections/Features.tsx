@@ -8,25 +8,25 @@ gsap.registerPlugin(ScrollTrigger);
 const features = [
   {
     id: 1,
-    title: 'AI-POWERED LEARNING',
+    title: 'PRACTICAL AI GUIDANCE',
     description:
-      'Personalized lessons that adapt to your pace and style. Our AI understands your strengths and weaknesses.',
+      'Skills you can immediately use on the street. Ninny AI adapts to your level, teaches tones, and guides polite particles (khráp/kâ).',
     image: '/feature-1.jpg',
     icon: Brain,
   },
   {
     id: 2,
-    title: 'CULTURE & SLANG',
+    title: 'SPOKEN CHAT & SLANG',
     description:
-      'Learn real Thai, not just textbook Thai. Master everyday expressions and cultural nuances.',
+      'Master modern Bangkok colloquialisms, texting expressions (555+), and trendy catchphrases like "Pang Mâak" and "Shot Feel".',
     image: '/feature-2.jpg',
     icon: MessageCircle,
   },
   {
     id: 3,
-    title: 'SPEAK LIKE A LOCAL',
+    title: 'REGIONAL DIALECTS',
     description:
-      'Practice conversations with AI that sounds natural. Build confidence for real-world interactions.',
+      'Warm local hearts in Chiang Mai (คำเมือง), Isan (ภาษาอีสาน), and Phuket (ภาษาใต้) with authentic regional phrasing.',
     image: '/feature-3.jpg',
     icon: Users,
   },

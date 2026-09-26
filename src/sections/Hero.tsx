@@ -86,13 +86,6 @@ const Hero = () => {
     return () => ctx.revert();
   }, []);
 
-  const scrollToPricing = () => {
-    const element = document.querySelector('#pricing');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <section
       ref={sectionRef}
@@ -119,43 +112,53 @@ const Hero = () => {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full py-12 lg:py-0">
           {/* Content */}
           <div className="order-2 lg:order-1 perspective-1000">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#ff3a1f]/10 text-[#ff3a1f] text-xs font-bold rounded-full uppercase tracking-wider mb-4">
+              <span>🇬🇧 Launched from London</span>
+              <span>•</span>
+              <span>Phase 1 Commercial Launch</span>
+            </div>
+
             <div ref={headlineRef} className="mb-6">
-              <h1 className="font-thunder text-6xl sm:text-7xl md:text-8xl lg:text-[130px] xl:text-[150px] leading-[0.9] text-[#070707] preserve-3d">
-                <span className="headline-word inline-block origin-bottom">LEARN</span>
-                <br />
-                <span className="headline-word inline-block origin-bottom">THAI</span>
+              <h1 className="font-thunder text-5xl sm:text-7xl md:text-8xl lg:text-[105px] xl:text-[120px] leading-[0.9] text-[#070707] preserve-3d">
+                <span className="headline-word inline-block origin-bottom">LEARN PRACTICAL THAI.</span>
                 <br />
                 <span className="headline-word inline-block origin-bottom text-[#ff3a1f]">
-                  WITH AI
+                  SPEAK WITH CONFIDENCE.
                 </span>
               </h1>
             </div>
 
             <p
               ref={subheadlineRef}
-              className="text-lg sm:text-xl text-[#5e5e5e] max-w-lg mb-8 font-manrope leading-relaxed"
+              className="text-base sm:text-xl text-[#5e5e5e] max-w-lg mb-4 font-manrope leading-relaxed"
             >
-              Master Thai language and culture with your personal AI tutor. From
-              basics to slang, speak like a local.
+              Learn Thai for real life with guided lessons, conversation practice, and <strong>Ninny AI</strong> — your personal Thai learning companion.
+            </p>
+
+            <p className="text-xs sm:text-sm text-[#777] max-w-lg mb-8 italic">
+              "Build the confidence to speak practical Thai through structured lessons, real-life practice, and personalised support from Ninny AI."
             </p>
 
             <div ref={ctaRef} className="flex flex-wrap gap-4">
               <Button
-                onClick={scrollToPricing}
-                className="bg-[#ff3a1f] hover:bg-[#070707] text-white px-8 py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 hover:glow-primary group"
+                onClick={() => {
+                  const event = new CustomEvent('open-onboarding');
+                  window.dispatchEvent(event);
+                }}
+                className="bg-[#ff3a1f] hover:bg-[#070707] text-white px-8 py-6 text-base sm:text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg group"
               >
-                Start Learning Free
+                Start Learning Thai
                 <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
               <Button
                 variant="outline"
                 onClick={() => {
-                  const element = document.querySelector('#features');
-                  if (element) element.scrollIntoView({ behavior: 'smooth' });
+                  const event = new CustomEvent('open-preview');
+                  window.dispatchEvent(event);
                 }}
-                className="border-2 border-[#070707] text-[#070707] hover:bg-[#070707] hover:text-white px-8 py-6 text-lg font-semibold transition-all duration-300"
+                className="border-2 border-[#070707] text-[#070707] hover:bg-[#070707] hover:text-white px-8 py-6 text-base sm:text-lg font-semibold transition-all duration-300"
               >
-                Explore Features
+                Try the Free Preview
               </Button>
             </div>
           </div>

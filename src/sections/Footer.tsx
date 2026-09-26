@@ -179,17 +179,17 @@ const Footer = () => {
                 <span className="text-white font-thunder text-xl">R</span>
               </div>
               <span className="font-thunder text-2xl tracking-tight">
-                RASSAME
+                RASSA
               </span>
             </a>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-400">
               <span className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                Bangkok, Thailand
+                London, United Kingdom
               </span>
               <span className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                hello@rassame.com
+                hello@rassa.uk
               </span>
             </div>
           </div>
@@ -206,7 +206,6 @@ const Footer = () => {
                   className="social-icon w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#ff3a1f] hover:text-white transition-all duration-300 hover:scale-110"
                   onClick={(e) => {
                     e.preventDefault();
-                    alert('Coming soon!');
                   }}
                 >
                   <Icon className="w-5 h-5" />
@@ -219,7 +218,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="text-center pt-8 border-t border-gray-800">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Rassame. All rights reserved.
+            © {new Date().getFullYear()} RASSA Platform Ltd. Launched from London, UK. All rights reserved.
           </p>
         </div>
       </div>

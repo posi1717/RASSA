@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Bot, User, Send } from 'lucide-react';
+import { User, Send, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,33 +17,43 @@ const initialMessages: Message[] = [
   {
     id: 1,
     type: 'ai',
-    text: "สวัสดี! I'm your Thai AI tutor. Ready to practice some conversation? 😊",
-    thai: 'Hello!',
+    text: "Sawàt-dee khráp/kâ! I'm Ninny AI, your personal Thai tutor from London. What real-life situation would you like to master today?",
+    thai: 'สวัสดีครับ/ค่ะ!',
   },
   {
     id: 2,
     type: 'user',
-    text: 'Yes! How do I order food at a street stall?',
+    text: 'I want to order chicken fried rice politely at a local shop.',
   },
   {
     id: 3,
     type: 'ai',
-    text: "Great question! You can say: 'ขอ...หนึ่งจานค่ะ/ครับ' (kor...nung jan ka/krap) which means 'One plate of...please.' Want to try?",
+    text: `You can say:
+
+“Khǒr khâo phàt gài nèung jaan khráp/kâ.”
+(ขอข้าวผัดไก่หนึ่งจานครับ/ค่ะ)
+
+If you would like it not spicy, add:
+“Mái phèt ná khráp/kâ.” (ไม่เผ็ดนะครับ/ค่ะ)`,
+    thai: 'Chicken Fried Rice Order',
   },
   {
     id: 4,
     type: 'user',
-    text: 'ขอผัดไทยหนึ่งจานค่ะ',
-    thai: 'One plate of Pad Thai, please.',
+    text: 'And how would an Isan person say it was delicious?',
   },
   {
     id: 5,
     type: 'ai',
-    text: "Perfect! 🎉 That's exactly right. You said 'One plate of Pad Thai, please.' The 'ค่ะ' (ka) at the end is the polite particle for women. Men would say 'ครับ' (krap).",
+    text: `In Isan, tell the cook with a big smile:
+
+“Sàep ee-lěe dêr!” (แซ่บอีหลีเด้อ!)
+It means mind-blowingly tasty, and they will absolutely adore you for saying it!`,
+    thai: 'Isan Dialect (ภาษาอีสาน)',
   },
 ];
 
-const AIChatDemo = () => {
+const AIChatDemo: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const messagesRef = useRef<(HTMLDivElement | null)[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -53,15 +62,13 @@ const AIChatDemo = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Messages reveal on scroll
       messagesRef.current.forEach((msg, index) => {
         if (!msg) return;
-
         const isUser = msg.classList.contains('user-message');
 
         gsap.fromTo(
           msg,
-          { x: isUser ? 50 : -50, opacity: 0 },
+          { x: isUser ? 40 : -40, opacity: 0 },
           {
             x: 0,
             opacity: 1,
@@ -69,7 +76,7 @@ const AIChatDemo = () => {
             ease: 'power3.out',
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: `${10 + index * 15}% center`,
+              start: `${10 + index * 12}% center`,
               toggleActions: 'play none none reverse',
             },
           }
@@ -93,156 +100,137 @@ const AIChatDemo = () => {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response
     setTimeout(() => {
       const aiResponse: Message = {
         id: messages.length + 2,
         type: 'ai',
-        text: 'Excellent effort! Keep practicing and you\'ll master Thai in no time. 🇹🇭',
+        text: `Excellent question! In Thai, you can say: "Tham-dâi dee mâak!" (ทำได้ดีมาก - Well done!). Remember to add "khráp" or "kâ" for polite warmth.`,
+        thai: 'Ninny AI Instant Correction',
       };
       setMessages((prev) => [...prev, aiResponse]);
       setIsTyping(false);
-    }, 1500);
+    }, 1200);
+  };
+
+  const handleOpenFullTutor = () => {
+    const event = new CustomEvent('open-ninny-tutor');
+    window.dispatchEvent(event);
   };
 
   return (
-    <section
-      ref={sectionRef}
-      className="py-24 bg-[#070707] min-h-screen"
-    >
+    <section ref={sectionRef} id="ninny-ai" className="py-24 bg-[#070707] min-h-screen text-white">
       <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-20">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="font-thunder text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white mb-4">
-            MEET YOUR AI TUTOR
+        <div className="text-center mb-12 max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#ff3a1f]/20 text-[#ff3a1f] text-xs font-bold rounded-full uppercase tracking-wider mb-4">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Meet Ninny AI</span>
+          </div>
+          <h2 className="font-thunder text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-4">
+            YOUR PERSONAL LEARNING COMPANION
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Practice real conversations, get instant feedback, and learn at your
-            own pace.
+          <p className="text-neutral-400 text-base sm:text-lg">
+            Ninny AI adapts to your level, explains tones & politeness, corrects mistakes, and guides you through real-world Thai scenarios.
           </p>
         </div>
 
         {/* Chat Interface */}
         <div className="max-w-3xl mx-auto">
-          <div className="bg-[#1a1a1a] rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
+          <div className="bg-[#141414] rounded-3xl overflow-hidden shadow-2xl border border-neutral-800">
             {/* Chat Header */}
-            <div className="bg-[#ff3a1f] px-6 py-4 flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                <Bot className="w-6 h-6 text-[#ff3a1f]" />
+            <div className="bg-gradient-to-r from-[#ff3a1f] to-[#ff6644] px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center font-thunder text-2xl text-[#ff3a1f] shadow-md">
+                  N
+                </div>
+                <div>
+                  <p className="text-white font-bold text-sm">Ninny AI Language Companion</p>
+                  <p className="text-white/80 text-xs">London Hub • Real-time Thai Tutor</p>
+                </div>
               </div>
-              <div>
-                <p className="text-white font-semibold">Rassame AI Tutor</p>
-                <p className="text-white/70 text-sm">Online • Ready to help</p>
-              </div>
+              <Button
+                size="sm"
+                onClick={handleOpenFullTutor}
+                className="bg-[#070707] hover:bg-neutral-900 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow"
+              >
+                <span>Launch Full Room</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
             </div>
 
             {/* Messages */}
-            <div className="p-6 space-y-4 max-h-[500px] overflow-y-auto">
+            <div className="p-6 space-y-4 max-h-[480px] overflow-y-auto">
               {messages.map((message, index) => (
                 <div
                   key={message.id}
-                  ref={(el) => { messagesRef.current[index] = el; }}
+                  ref={(el) => {
+                    messagesRef.current[index] = el;
+                  }}
                   className={`flex gap-3 ${
-                    message.type === 'user'
-                      ? 'user-message flex-row-reverse'
-                      : 'ai-message'
+                    message.type === 'user' ? 'user-message flex-row-reverse' : 'ai-message'
                   }`}
                 >
-                  {/* Avatar */}
                   <div
-                    className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center ${
-                      message.type === 'user'
-                        ? 'bg-[#f0ede8]'
-                        : 'bg-[#ff3a1f]'
+                    className={`w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center ${
+                      message.type === 'user' ? 'bg-[#ff3a1f] text-white' : 'bg-[#222] text-[#ff3a1f]'
                     }`}
                   >
                     {message.type === 'user' ? (
-                      <User className="w-5 h-5 text-[#070707]" />
+                      <User className="w-4 h-4" />
                     ) : (
-                      <Bot className="w-5 h-5 text-white" />
+                      <span className="font-thunder text-lg">N</span>
                     )}
                   </div>
 
-                  {/* Message Bubble */}
                   <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    className={`max-w-[85%] rounded-3xl px-5 py-3.5 ${
                       message.type === 'user'
-                        ? 'bg-[#ff3a1f] text-white rounded-tr-sm'
-                        : 'bg-gray-800 text-white rounded-tl-sm'
+                        ? 'bg-[#ff3a1f] text-white rounded-tr-sm shadow-md'
+                        : 'bg-[#1f1f1f] text-neutral-100 rounded-tl-sm border border-neutral-800'
                     }`}
                   >
                     {message.thai && (
-                      <p className="text-xs text-gray-400 mb-1">
+                      <p className="text-[11px] font-bold text-[#ff3a1f] uppercase tracking-wider mb-1">
                         {message.thai}
                       </p>
                     )}
-                    <p className="text-sm leading-relaxed">{message.text}</p>
+                    <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-line">
+                      {message.text}
+                    </p>
                   </div>
                 </div>
               ))}
 
-              {/* Typing indicator */}
               {isTyping && (
-                <div className="flex gap-3 ai-message">
-                  <div className="w-10 h-10 rounded-full bg-[#ff3a1f] flex-shrink-0 flex items-center justify-center">
-                    <Bot className="w-5 h-5 text-white" />
+                <div className="flex gap-3 items-center text-xs text-neutral-400">
+                  <div className="w-8 h-8 rounded-xl bg-[#222] text-[#ff3a1f] flex items-center justify-center font-thunder text-sm">
+                    N
                   </div>
-                  <div className="bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3">
-                    <div className="flex gap-1">
-                      <span
-                        className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
-                        style={{ animationDelay: '0ms' }}
-                      />
-                      <span
-                        className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
-                        style={{ animationDelay: '150ms' }}
-                      />
-                      <span
-                        className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
-                        style={{ animationDelay: '300ms' }}
-                      />
-                    </div>
+                  <div className="bg-[#1f1f1f] px-4 py-2.5 rounded-2xl border border-neutral-800">
+                    Ninny AI is formulating response...
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Input Area */}
-            <div className="p-4 border-t border-gray-800 bg-[#1a1a1a]">
-              <div className="flex gap-3">
-                <Input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Type your message in Thai or English..."
-                  className="flex-1 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 focus:border-[#ff3a1f] focus:ring-[#ff3a1f]"
-                />
-                <Button
-                  onClick={handleSend}
-                  className="bg-[#ff3a1f] hover:bg-[#ff5533] text-white px-4"
-                >
-                  <Send className="w-5 h-5" />
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500 mt-2 text-center">
-                Try typing in Thai! The AI understands both languages.
-              </p>
+            {/* Input Bar */}
+            <div className="p-4 border-t border-neutral-800 bg-[#141414] flex gap-2">
+              <input
+                type="text"
+                placeholder="Ask Ninny AI a question (e.g. How do I order iced tea not too sweet?)..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                className="flex-1 bg-[#1f1f1f] border border-neutral-700 rounded-2xl px-4 py-3 text-xs sm:text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#ff3a1f]"
+              />
+              <Button
+                onClick={handleSend}
+                className="bg-[#ff3a1f] hover:bg-[#d82a12] text-white px-5 rounded-2xl"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
             </div>
           </div>
-        </div>
-
-        {/* Features */}
-        <div className="grid sm:grid-cols-3 gap-6 mt-12 max-w-3xl mx-auto">
-          {[
-            { label: '24/7 Availability', desc: 'Learn anytime, anywhere' },
-            { label: 'Instant Feedback', desc: 'Correct mistakes in real-time' },
-            { label: 'Personalized', desc: 'Adapts to your learning style' },
-          ].map((feature, index) => (
-            <div key={index} className="text-center">
-              <p className="text-white font-semibold mb-1">{feature.label}</p>
-              <p className="text-gray-400 text-sm">{feature.desc}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>
