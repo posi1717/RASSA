@@ -72,7 +72,7 @@ const AppContent: React.FC = () => {
   }, [setIsOnboardingModalOpen, setCurrentView, setIsSubscriptionModalOpen, setSubscriptionTier]);
 
   return (
-    <div className="min-h-screen bg-[#f0ede8] text-[#070707] flex flex-col font-manrope selection:bg-[#ff3a1f] selection:text-white">
+    <div className="min-h-screen bg-[#f7f4ef] text-[#111111] flex flex-col font-manrope selection:bg-[#ff5638] selection:text-white">
       {/* Top Navigation */}
       <HeaderNav />
 

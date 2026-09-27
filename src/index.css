@@ -13,7 +13,7 @@
 
 @layer base {
   :root {
-    --background: 40 20% 95%;
+    --background: 36 24% 97%;
     --foreground: 0 0% 3%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3%;
@@ -37,7 +37,7 @@
     --color-primary: #ff3a1f;
     --color-secondary: #070707;
     --color-text-gray: #5e5e5e;
-    --color-bg-light: #f0ede8;
+    --color-bg-light: #f7f4ef;
     --color-bg-cream: #fcf3d9;
     --color-border: #cdcdcd;
     
@@ -69,7 +69,7 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Thunder', sans-serif;
     text-transform: uppercase;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 }
 
@@ -83,7 +83,7 @@
   }
   
   .text-gradient {
-    background: linear-gradient(135deg, #ff3a1f 0%, #ff6b4f 100%);
+    background: linear-gradient(135deg, #ff5638 0%, #ff8b72 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

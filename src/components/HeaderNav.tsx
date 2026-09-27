@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
+import { BookOpen, Bookmark, Flame, Home, MapPin, Menu, MessageSquare, MessageSquareHeart, Sparkles, X, Crown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { AppView } from '../context/AppContext';
-import {
-  Sparkles,
-  Flame,
-  BookOpen,
-  MessageSquare,
-  Bookmark,
-  MapPin,
-  Menu,
-  X,
-  MessageSquareHeart,
-  Home,
-  Crown,
-} from 'lucide-react';
 import { Button } from './ui/button';
+
+const navItems: { view: AppView; label: string; icon: React.ReactNode }[] = [
+  { view: 'dashboard', label: 'Learn', icon: <Home className="h-4 w-4" /> },
+  { view: 'courses', label: 'Lessons', icon: <BookOpen className="h-4 w-4" /> },
+  { view: 'tutor', label: 'Ninny AI', icon: <MessageSquare className="h-4 w-4" /> },
+  { view: 'vocab', label: 'Saved words', icon: <Bookmark className="h-4 w-4" /> },
+];
 
 export const HeaderNav: React.FC = () => {
   const {
@@ -25,17 +20,8 @@ export const HeaderNav: React.FC = () => {
     setIsFeedbackModalOpen,
     userProfile,
   } = useApp();
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const navItems: { view: AppView; label: string; icon: React.ReactNode }[] = [
-    { view: 'landing', label: 'Home', icon: <Home className="w-4 h-4" /> },
-    { view: 'dashboard', label: 'My Progress', icon: <Flame className="w-4 h-4 text-[#ff3a1f]" /> },
-    { view: 'courses', label: 'Courses', icon: <BookOpen className="w-4 h-4" /> },
-    { view: 'regional-slang', label: 'Slang & Regional', icon: <MapPin className="w-4 h-4 text-[#0ea5e9]" /> },
-    { view: 'tutor', label: 'Ninny AI Tutor', icon: <MessageSquare className="w-4 h-4 text-[#8b5cf6]" /> },
-    { view: 'vocab', label: 'Vocab Vault', icon: <Bookmark className="w-4 h-4 text-[#f59e0b]" /> },
-  ];
+  const isPaid = subscriptionTier === 'monthly' || subscriptionTier === 'yearly';
 
   const handleNavClick = (view: AppView) => {
     setCurrentView(view);
@@ -43,147 +29,70 @@ export const HeaderNav: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const isPaid = subscriptionTier === 'monthly' || subscriptionTier === 'yearly';
-
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#f0ede8]/90 backdrop-blur-md border-b border-[#e5e0d8] transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-        {/* Brand Logo & London Subtext */}
-        <div
-          onClick={() => handleNavClick('landing')}
-          className="flex items-center gap-3 cursor-pointer group"
-        >
-          <div className="w-10 h-10 rounded-xl bg-[#070707] text-white flex items-center justify-center font-thunder text-2xl tracking-tighter shadow-md group-hover:bg-[#ff3a1f] transition-colors">
-            R
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-thunder text-2xl tracking-wider text-[#070707]">RASSA</span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#e5e0d8] text-[#5e5e5e] rounded uppercase tracking-wider">
-                London
-              </span>
-            </div>
-            <p className="text-[10px] text-[#777] font-medium leading-none">Practical Thai Learning</p>
-          </div>
-        </div>
+    <header className="sticky top-0 z-40 w-full border-b border-[#e7e1d8] bg-[#f7f4ef]/95 backdrop-blur-xl">
+      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <button onClick={() => handleNavClick('landing')} className="flex shrink-0 items-center gap-3 text-left" aria-label="Go to RASSA home">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#111111] font-thunder text-2xl text-white shadow-sm">R</span>
+          <span className="hidden sm:block">
+            <span className="block font-thunder text-2xl tracking-wide text-[#111111]">RASSA</span>
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8a837b]">Practical Thai</span>
+          </span>
+        </button>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1 bg-white/70 p-1 rounded-2xl border border-[#e5e0d8] shadow-sm">
-          {navItems.map((item) => {
-            const isActive = currentView === item.view;
-            return (
+        {currentView !== 'landing' && (
+          <nav className="hidden items-center gap-1 rounded-2xl border border-[#e7e1d8] bg-white/75 p-1 lg:flex" aria-label="Primary">
+            {navItems.map((item) => (
               <button
                 key={item.view}
                 onClick={() => handleNavClick(item.view)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                  isActive
-                    ? 'bg-[#070707] text-white shadow-sm'
-                    : 'text-[#5e5e5e] hover:text-[#070707] hover:bg-[#eadecc]/60'
-                }`}
+                className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-colors ${currentView === item.view ? 'bg-[#111111] text-white' : 'text-[#6f6962] hover:bg-[#f0ebe4] hover:text-[#111111]'}`}
               >
                 {item.icon}
-                <span>{item.label}</span>
+                {item.label}
               </button>
-            );
-          })}
-        </nav>
+            ))}
+            <button onClick={() => handleNavClick('regional-slang')} className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-colors ${currentView === 'regional-slang' ? 'bg-[#111111] text-white' : 'text-[#6f6962] hover:bg-[#f0ebe4] hover:text-[#111111]'}`}>
+              <MapPin className="h-4 w-4" />
+              Culture
+            </button>
+          </nav>
+        )}
 
-        {/* Right Action Icons & Membership Status */}
-        <div className="hidden sm:flex items-center gap-3">
-          {/* Streak Badge */}
-          <div
-            onClick={() => handleNavClick('dashboard')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#e5e0d8] rounded-xl text-xs font-bold text-[#070707] shadow-sm cursor-pointer hover:border-[#ff3a1f] transition-colors"
-            title="Daily Learning Streak"
-          >
-            <Flame className="w-4 h-4 text-[#ff3a1f] fill-[#ff3a1f]" />
-            <span>{userProfile.streakDays}d Streak</span>
-          </div>
-
-          {/* Subscription Tier Button */}
-          {isPaid ? (
-            <div
-              onClick={() => setIsSubscriptionModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-400/40 rounded-xl text-xs font-bold text-amber-900 cursor-pointer shadow-sm hover:scale-105 transition-all"
-            >
-              <Crown className="w-3.5 h-3.5 text-amber-600 fill-amber-600" />
-              <span>{subscriptionTier === 'yearly' ? 'Yearly Member' : 'Monthly Member'}</span>
-            </div>
-          ) : (
-            <Button
-              onClick={() => setIsSubscriptionModalOpen(true)}
-              className="bg-[#ff3a1f] hover:bg-[#d82a12] text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-md transition-all hover:scale-105 flex items-center gap-1.5"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Unlock All (£19.60/mo)</span>
-            </Button>
+        <div className="flex items-center gap-2">
+          {currentView !== 'landing' && (
+            <button onClick={() => handleNavClick('dashboard')} className="hidden items-center gap-1.5 rounded-xl border border-[#e7e1d8] bg-white px-3 py-2 text-xs font-bold text-[#111111] sm:flex" title="Learning streak">
+              <Flame className="h-4 w-4 fill-[#ff5638] text-[#ff5638]" />
+              {userProfile.streakDays} day streak
+            </button>
           )}
-
-          {/* Feedback Button */}
-          <button
-            onClick={() => setIsFeedbackModalOpen(true)}
-            className="p-2 text-[#5e5e5e] hover:text-[#070707] hover:bg-white rounded-xl border border-transparent hover:border-[#e5e0d8] transition-all"
-            title="Share Feedback"
-          >
-            <MessageSquareHeart className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Mobile Hamburger Button */}
-        <div className="flex items-center gap-2 lg:hidden">
-          <Button
-            size="sm"
-            onClick={() => setIsSubscriptionModalOpen(true)}
-            className="bg-[#ff3a1f] text-white text-xs px-2.5 py-1 rounded-lg"
-          >
-            {isPaid ? 'Member' : 'Upgrade'}
+          <Button onClick={() => setIsSubscriptionModalOpen(true)} className="hidden rounded-xl bg-[#ff5638] px-4 text-xs font-bold text-white hover:bg-[#111111] sm:flex">
+            {isPaid ? <><Crown className="mr-1.5 h-3.5 w-3.5" /> Member</> : <><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Unlock full access</>}
           </Button>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-[#070707] bg-white border border-[#e5e0d8] rounded-xl"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {currentView !== 'landing' && (
+            <button onClick={() => setIsFeedbackModalOpen(true)} className="hidden rounded-xl p-2 text-[#77716a] hover:bg-white hover:text-[#111111] sm:block" title="Share feedback" aria-label="Share feedback">
+              <MessageSquareHeart className="h-4 w-4" />
+            </button>
+          )}
+          <button onClick={() => setMobileMenuOpen((open) => !open)} className="rounded-xl border border-[#e7e1d8] bg-white p-2 text-[#111111] lg:hidden" aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}>
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-[#e5e0d8] bg-[#f0ede8] p-4 space-y-2 animate-in slide-in-from-top duration-200">
-          {navItems.map((item) => (
-            <button
-              key={item.view}
-              onClick={() => handleNavClick(item.view)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition-all ${
-                currentView === item.view
-                  ? 'bg-[#070707] text-white'
-                  : 'bg-white/60 text-[#070707]'
-              }`}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </button>
-          ))}
-          <div className="pt-2 flex gap-2">
-            <Button
-              onClick={() => {
-                setIsSubscriptionModalOpen(true);
-                setMobileMenuOpen(false);
-              }}
-              className="flex-1 py-3 bg-[#ff3a1f] text-white text-xs font-semibold rounded-xl"
-            >
-              Membership & Billing
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsFeedbackModalOpen(true);
-                setMobileMenuOpen(false);
-              }}
-              className="py-3 text-xs rounded-xl border-[#e5e0d8]"
-            >
-              Feedback
-            </Button>
+      {mobileMenuOpen && currentView !== 'landing' && (
+        <div className="border-t border-[#e7e1d8] bg-[#f7f4ef] p-4 lg:hidden">
+          <div className="grid grid-cols-2 gap-2">
+            {[...navItems, { view: 'regional-slang' as AppView, label: 'Culture', icon: <MapPin className="h-4 w-4" /> }].map((item) => (
+              <button key={item.view} onClick={() => handleNavClick(item.view)} className={`flex items-center gap-2 rounded-xl p-3 text-left text-xs font-bold ${currentView === item.view ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}>
+                {item.icon}
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <div className="mt-3 flex gap-2">
+            <Button onClick={() => { setIsSubscriptionModalOpen(true); setMobileMenuOpen(false); }} className="flex-1 rounded-xl bg-[#ff5638] text-xs font-bold text-white">Membership</Button>
+            <Button variant="outline" onClick={() => { setIsFeedbackModalOpen(true); setMobileMenuOpen(false); }} className="rounded-xl border-[#e7e1d8] text-xs">Feedback</Button>
           </div>
         </div>
       )}
