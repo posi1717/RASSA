@@ -26,11 +26,19 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can read own profile"
   ON public.profiles FOR SELECT
+  TO authenticated
   USING (auth.uid() = id);
+
+CREATE POLICY "Users can create own profile"
+  ON public.profiles FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Users can update own profile"
   ON public.profiles FOR UPDATE
-  USING (auth.uid() = id);
+  TO authenticated
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
 
 -- 2. User Lesson Progress Table
 CREATE TABLE IF NOT EXISTS public.user_progress (
