@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { UserProfile, SubscriptionTier, Lesson } from '../types/rassa';
-import { localStore } from '../lib/supabase';
+import { localStore, type SavedVocabItem } from '../lib/supabase';
 import { LESSONS_DATABASE } from '../data/curriculum';
 
 export type AppView =
@@ -25,8 +25,8 @@ interface AppContextType {
   setSubscriptionTier: (tier: SubscriptionTier) => void;
   completedLessonIds: string[];
   markLessonComplete: (lessonId: string) => void;
-  savedVocab: any[];
-  toggleSaveVocab: (item: any) => void;
+  savedVocab: SavedVocabItem[];
+  toggleSaveVocab: (item: SavedVocabItem) => void;
   isVocabSaved: (id: string) => boolean;
   aiMessageCount: number;
   incrementAIMessageCount: () => number;
@@ -67,7 +67,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [completedLessonIds, setCompletedLessonIds] = useState<string[]>(() =>
     localStore.getCompletedLessons()
   );
-  const [savedVocab, setSavedVocab] = useState<any[]>(() => localStore.getSavedVocab());
+  const [savedVocab, setSavedVocab] = useState<SavedVocabItem[]>(() => localStore.getSavedVocab());
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     return localStore.getProfile() || DEFAULT_PROFILE;
   });
@@ -103,7 +103,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     updateUserProfile({ completedLessonIds: updated });
   };
 
-  const toggleSaveVocab = (item: any) => {
+  const toggleSaveVocab = (item: SavedVocabItem) => {
     const updated = localStore.saveVocabItem(item);
     setSavedVocab([...updated]);
   };

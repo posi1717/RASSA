@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { AppProvider, useApp } from './context/AppContext';
+import type { SubscriptionTier } from './types/rassa';
 import { HeaderNav } from './components/HeaderNav';
 import { DashboardView } from './components/DashboardView';
 import { CourseCatalogView } from './components/CourseCatalogView';
@@ -50,9 +51,10 @@ const AppContent: React.FC = () => {
     const handleOpenOnboarding = () => setIsOnboardingModalOpen(true);
     const handleOpenPreview = () => setCurrentView('courses');
     const handleOpenNinnyTutor = () => setCurrentView('tutor');
-    const handleOpenSubscriptionPlan = (e: any) => {
-      if (e?.detail?.planId) {
-        setSubscriptionTier(e.detail.planId);
+    const handleOpenSubscriptionPlan = (event: Event) => {
+      const planId = (event as CustomEvent<{ planId?: SubscriptionTier }>).detail?.planId;
+      if (planId) {
+        setSubscriptionTier(planId);
       }
       setIsSubscriptionModalOpen(true);
     };

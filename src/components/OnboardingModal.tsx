@@ -79,7 +79,7 @@ export const OnboardingModal: React.FC = () => {
                   <button
                     key={lvl.id}
                     type="button"
-                    onClick={() => setThaiLevel(lvl.id as any)}
+                    onClick={() => setThaiLevel(lvl.id as 'beginner' | 'elementary' | 'intermediate')}
                     className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between ${
                       thaiLevel === lvl.id
                         ? 'bg-white border-[#ff3a1f] shadow-sm'
@@ -125,7 +125,7 @@ export const OnboardingModal: React.FC = () => {
                 <button
                   key={g.id}
                   type="button"
-                  onClick={() => setGoal(g.id as any)}
+                  onClick={() => setGoal(g.id as 'travel' | 'daily_life' | 'business' | 'culture' | 'relationships')}
                   className={`w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between ${
                     goal === g.id
                       ? 'bg-white border-[#ff3a1f] shadow-sm'

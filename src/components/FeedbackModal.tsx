@@ -60,7 +60,7 @@ export const FeedbackModal: React.FC = () => {
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => setCategory(c.id as any)}
+                  onClick={() => setCategory(c.id as 'feedback' | 'bug' | 'lesson_request')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                     category === c.id
                       ? 'bg-[#070707] text-white border-[#070707]'

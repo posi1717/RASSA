@@ -129,7 +129,7 @@ export async function askNinnyAI(
   userMessage: string,
   history: ChatMessage[],
   scenario?: RolePlayScenario
-): Promise<{ text: string; breakdown?: any }> {
+): Promise<{ text: string; breakdown?: unknown }> {
   const knowledgeContext = buildRassaKnowledgeContext(userMessage, scenario);
 
   // If Gemini API Key is provided, call Google Gemini 1.5 Flash

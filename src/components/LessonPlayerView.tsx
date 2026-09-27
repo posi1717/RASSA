@@ -147,8 +147,8 @@ export const LessonPlayerView: React.FC = () => {
                   onClick={() =>
                     toggleSaveVocab({
                       id: currentStep.id,
-                      thai: currentStep.thaiScript,
-                      roman: currentStep.romanization,
+                      thai: currentStep.thaiScript || '',
+                      roman: currentStep.romanization || '',
                       english: currentStep.naturalEnglish,
                       category: activeLesson.categoryName,
                     })

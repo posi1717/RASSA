@@ -1,4 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
+import type { UserProfile } from '../types/rassa';
+
+export interface SavedVocabItem {
+  id: string;
+  category?: string;
+  thai: string;
+  roman: string;
+  english: string;
+}
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -30,7 +39,7 @@ export const localStore = {
       return null;
     }
   },
-  saveProfile: (profile: any) => {
+  saveProfile: (profile: UserProfile) => {
     localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
   },
   getCompletedLessons: (): string[] => {
@@ -49,7 +58,7 @@ export const localStore = {
     }
     return list;
   },
-  getSavedVocab: (): any[] => {
+  getSavedVocab: (): SavedVocabItem[] => {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SAVED_VOCAB);
       return data ? JSON.parse(data) : [];
@@ -57,9 +66,9 @@ export const localStore = {
       return [];
     }
   },
-  saveVocabItem: (item: any): any[] => {
+  saveVocabItem: (item: SavedVocabItem): SavedVocabItem[] => {
     const list = localStore.getSavedVocab();
-    const existing = list.findIndex((i: any) => i.id === item.id);
+    const existing = list.findIndex((i) => i.id === item.id);
     if (existing >= 0) {
       list.splice(existing, 1);
     } else {
@@ -69,7 +78,7 @@ export const localStore = {
     return list;
   },
   getSubscriptionTier: (): 'free' | 'monthly' | 'yearly' => {
-    return (localStorage.getItem(STORAGE_KEYS.SUBSCRIPTION) as any) || 'free';
+    return (localStorage.getItem(STORAGE_KEYS.SUBSCRIPTION) as 'free' | 'monthly' | 'yearly') || 'free';
   },
   setSubscriptionTier: (tier: 'free' | 'monthly' | 'yearly') => {
     localStorage.setItem(STORAGE_KEYS.SUBSCRIPTION, tier);
@@ -84,7 +93,7 @@ export const localStore = {
     localStorage.setItem(STORAGE_KEYS.AI_QUOTA, next.toString());
     return next;
   },
-  resetAIMessageCount: () => {
+  resetAIMessageCount: (): void => {
     localStorage.setItem(STORAGE_KEYS.AI_QUOTA, '0');
   },
 };
