@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { User, Send, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { askNinnyAI } from '../services/ninnyAi';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -87,7 +88,7 @@ const AIChatDemo: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
 
     const newMessage: Message = {
@@ -96,20 +97,24 @@ const AIChatDemo: React.FC = () => {
       text: inputValue,
     };
 
-    setMessages([...messages, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     setInputValue('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: messages.length + 2,
-        type: 'ai',
-        text: `Excellent question! In Thai, you can say: "Tham-dâi dee mâak!" (ทำได้ดีมาก - Well done!). Remember to add "khráp" or "kâ" for polite warmth.`,
-        thai: 'Ninny AI Instant Correction',
-      };
-      setMessages((prev) => [...prev, aiResponse]);
+    try {
+      const reply = await askNinnyAI(inputValue.trim(), [], undefined);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          type: 'ai',
+          text: reply.text,
+          thai: 'Ninny AI grounded in the RASSA library',
+        },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 1200);
+    }
   };
 
   const handleOpenFullTutor = () => {

@@ -1,4 +1,6 @@
 import type { RolePlayScenario, ChatMessage } from '../types/rassa';
+import { LESSONS_DATABASE } from '../data/curriculum';
+import { REGIONAL_PHRASES_COLLECTION, THAI_SLANG_COLLECTION } from '../data/regionalAndSlang';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
@@ -76,11 +78,60 @@ Whenever teaching or correcting Thai, always provide:
 Keep explanations clear, engaging, and directly applicable in real conversations.
 `;
 
+function normalise(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9\u0E00-\u0E7F]+/g, ' ');
+}
+
+function buildRassaKnowledgeContext(query: string, scenario?: RolePlayScenario): string {
+  const queryWords = new Set(normalise(query).split(/\s+/).filter((word) => word.length > 2));
+  const score = (text: string) =>
+    [...queryWords].reduce((total, word) => total + (normalise(text).includes(word) ? 1 : 0), 0);
+
+  const lessonMatches = LESSONS_DATABASE
+    .flatMap((lesson) => lesson.steps.map((step) => ({
+      lesson,
+      step,
+      score: score(`${lesson.title} ${lesson.subtitle} ${step.title} ${step.naturalEnglish} ${step.culturalTip || ''}`),
+    })))
+    .filter((match) => match.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+  const slangMatches = THAI_SLANG_COLLECTION
+    .map((item) => ({ item, score: score(`${item.slangRoman} ${item.actualMeaning} ${item.exampleEnglish} ${item.whenToUse}`) }))
+    .filter((match) => match.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 2);
+  const regionalMatches = REGIONAL_PHRASES_COLLECTION
+    .map((item) => ({ item, score: score(`${item.region} ${item.phraseRoman} ${item.english} ${item.culturalNote}`) }))
+    .filter((match) => match.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 2);
+
+  const sections = [
+    scenario
+      ? `ACTIVE SCENARIO: ${scenario.title} (${scenario.location})\n${scenario.description}\nStarter: ${scenario.starterPrompt}\nSuggested phrases: ${scenario.suggestedPhrases.map((phrase) => `${phrase.thai} | ${phrase.roman} | ${phrase.english}`).join('; ')}`
+      : '',
+    lessonMatches.length
+      ? `MATCHING RASSA LESSONS:\n${lessonMatches.map(({ lesson, step }) => `- ${lesson.title} / ${step.title}: ${step.thaiScript || ''} | ${step.romanization || ''} | ${step.naturalEnglish}. ${step.culturalTip || ''}`).join('\n')}`
+      : '',
+    slangMatches.length
+      ? `MATCHING RASSA SLANG:\n${slangMatches.map(({ item }) => `- ${item.slangRoman} (${item.slangThai}): ${item.actualMeaning}. Example: ${item.exampleEnglish}. Use: ${item.whenToUse}`).join('\n')}`
+      : '',
+    regionalMatches.length
+      ? `MATCHING RASSA REGIONAL PHRASES:\n${regionalMatches.map(({ item }) => `- ${item.region}: ${item.phraseRoman} (${item.phraseThai}) = ${item.english}. Standard Thai: ${item.standardRoman}. ${item.culturalNote}`).join('\n')}`
+      : '',
+  ].filter(Boolean);
+
+  return sections.length ? sections.join('\n\n') : 'No directly matching RASSA library entry was found for this question.';
+}
+
 export async function askNinnyAI(
   userMessage: string,
   history: ChatMessage[],
   scenario?: RolePlayScenario
 ): Promise<{ text: string; breakdown?: any }> {
+  const knowledgeContext = buildRassaKnowledgeContext(userMessage, scenario);
+
   // If Gemini API Key is provided, call Google Gemini 1.5 Flash
   if (GEMINI_API_KEY) {
     try {
@@ -95,7 +146,7 @@ export async function askNinnyAI(
           role: 'user',
           parts: [
             {
-              text: `${SYSTEM_INSTRUCTION}\n${
+              text: `${SYSTEM_INSTRUCTION}\n\nRASSA LIBRARY CONTEXT:\n${knowledgeContext}\n\n${
                 scenario ? `Current Active Scenario: ${scenario.title} (${scenario.description})\n` : ''
               }Learner query: ${userMessage}`,
             },
@@ -126,6 +177,12 @@ export async function askNinnyAI(
 
   // Smart Built-in Fallback Engine for instant offline/demo testing
   const lower = userMessage.toLowerCase();
+
+  if (knowledgeContext !== 'No directly matching RASSA library entry was found for this question.') {
+    return {
+      text: `Here is the closest match from your RASSA learning library:\n\n${knowledgeContext}\n\nTry saying the Thai phrase aloud, then ask me to correct your tone or make it more natural for the scenario.`,
+    };
+  }
 
   if (lower.includes('hello') || lower.includes('hi') || lower.includes('sawasdee')) {
     return {

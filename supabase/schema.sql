@@ -47,7 +47,9 @@ ALTER TABLE public.user_progress ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users manage own progress"
   ON public.user_progress FOR ALL
-  USING (auth.uid() = id);
+  TO authenticated
+  USING ((select auth.uid()) = user_id)
+  WITH CHECK ((select auth.uid()) = user_id);
 
 -- 3. Vocab Vault (Saved Words & Phrases)
 CREATE TABLE IF NOT EXISTS public.vocab_vault (
@@ -65,7 +67,9 @@ ALTER TABLE public.vocab_vault ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users manage own vocab"
   ON public.vocab_vault FOR ALL
-  USING (auth.uid() = id);
+  TO authenticated
+  USING ((select auth.uid()) = user_id)
+  WITH CHECK ((select auth.uid()) = user_id);
 
 -- 4. Ninny AI Chat History
 CREATE TABLE IF NOT EXISTS public.chat_messages (
@@ -81,4 +85,6 @@ ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users access own chat history"
   ON public.chat_messages FOR ALL
-  USING (auth.uid() = id);
+  TO authenticated
+  USING ((select auth.uid()) = user_id)
+  WITH CHECK ((select auth.uid()) = user_id);

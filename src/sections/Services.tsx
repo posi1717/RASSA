@@ -1,7 +1,14 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { BookOpen, MessageSquare, Globe, Zap, Briefcase, Plane } from 'lucide-react';
+import {
+  BookOpen,
+  MessageSquare,
+  Globe,
+  Zap,
+  Briefcase,
+  Plane,
+} from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -51,8 +58,8 @@ const Services = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Headline word cascade
       const words = headlineRef.current?.querySelectorAll('.word');
+
       if (words) {
         gsap.fromTo(
           words,
@@ -72,7 +79,6 @@ const Services = () => {
         );
       }
 
-      // Cards animation
       cardsRef.current.forEach((card, index) => {
         if (!card) return;
 
@@ -96,7 +102,6 @@ const Services = () => {
           }
         );
 
-        // Parallax
         gsap.to(card, {
           y: -40,
           ease: 'none',
@@ -113,6 +118,28 @@ const Services = () => {
     return () => ctx.revert();
   }, []);
 
+  const handleCardClick = (serviceTitle: string) => {
+    window.dispatchEvent(
+      new CustomEvent('rassame:lesson-selected', {
+        detail: { title: serviceTitle },
+      })
+    );
+
+    const tutor = document.getElementById('ai-tutor');
+
+    if (tutor) {
+      tutor.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+      return;
+    }
+
+    alert(
+      `เลือกบทเรียน: ${serviceTitle}\n\nยังหา AI Tutor ไม่เจอ ให้เพิ่ม id="ai-tutor" ที่ section ของ AI Tutor ก่อน`
+    );
+  };
+
   const headlineText = 'WHAT WE OFFER';
 
   return (
@@ -122,7 +149,6 @@ const Services = () => {
       className="py-24 bg-[#f0ede8]"
     >
       <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-20">
-        {/* Section Header */}
         <div className="text-center mb-16">
           <h2
             ref={headlineRef}
@@ -134,39 +160,56 @@ const Services = () => {
               </span>
             ))}
           </h2>
+
           <p className="text-[#5e5e5e] text-lg max-w-2xl mx-auto">
             Comprehensive Thai learning programs designed for every goal and
             skill level.
           </p>
         </div>
 
-        {/* Services Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service, index) => {
             const Icon = service.icon;
+
             return (
               <div
                 key={service.id}
-                ref={(el) => { cardsRef.current[index] = el; }}
-                className="group"
+                ref={(el) => {
+                  cardsRef.current[index] = el;
+                }}
+                className="group cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-label={`Open ${service.title} in AI Tutor`}
+                onClick={() => handleCardClick(service.title)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleCardClick(service.title);
+                  }
+                }}
               >
                 <div className="h-full bg-white border-2 border-[#cdcdcd] rounded-xl p-6 transition-all duration-300 hover:border-[#ff3a1f] hover:-translate-y-4 hover:shadow-xl hover:scale-[1.02]">
-                  {/* Number and Icon */}
                   <div className="flex items-start justify-between mb-4">
                     <span className="font-thunder text-4xl text-[#070707] transition-all duration-300 group-hover:text-[#ff3a1f] group-hover:scale-120">
                       0{service.id}
                     </span>
+
                     <div className="w-12 h-12 bg-[#f0ede8] rounded-lg flex items-center justify-center transition-all duration-300 group-hover:bg-[#ff3a1f]">
                       <Icon className="w-6 h-6 text-[#5e5e5e] transition-colors duration-300 group-hover:text-white" />
                     </div>
                   </div>
 
-                  {/* Content */}
                   <h3 className="font-thunder text-2xl text-[#070707] mb-2 transition-colors duration-300 group-hover:text-[#ff3a1f]">
                     {service.title}
                   </h3>
+
                   <p className="text-[#5e5e5e] text-sm leading-relaxed">
                     {service.description}
+                  </p>
+
+                  <p className="mt-5 text-xs font-semibold uppercase tracking-widest text-[#ff3a1f] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    Start with AI Tutor →
                   </p>
                 </div>
               </div>

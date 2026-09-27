@@ -57,11 +57,13 @@
   
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
   
   body {
     @apply bg-[#f0ede8] text-foreground antialiased;
     font-family: 'Manrope', sans-serif;
+    overflow-x: hidden;
   }
   
   h1, h2, h3, h4, h5, h6 {
