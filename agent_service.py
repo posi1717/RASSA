@@ -1,7 +1,9 @@
 import os
+from io import BytesIO
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from google import genai
 from groq import Groq
@@ -10,14 +12,16 @@ from groq import Groq
 load_dotenv()
 
 app = FastAPI(title="RASSAME Agent Service")
+cors_origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()]
+cors_origins.extend([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+])
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:4173",
-        "http://127.0.0.1:4173",
-    ],
+    allow_origins=sorted(set(cors_origins)),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,6 +34,8 @@ model_name = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 location = os.getenv("GOOGLE_CLOUD_LOCATION", "global")
 groq_api_key = os.getenv("GROQ_API_KEY")
 groq_transcription_model = os.getenv("GROQ_TRANSCRIPTION_MODEL", "whisper-large-v3-turbo")
+groq_tts_model = os.getenv("GROQ_TTS_MODEL", "canopylabs/orpheus-v1-english")
+groq_tts_voice = os.getenv("GROQ_TTS_VOICE", "hannah")
 
 # Prefer ADC through Vertex AI for Google Cloud deployments; an explicit
 # server-side key remains available for local development without exposing it
@@ -53,6 +59,10 @@ TUTOR_SYSTEM_PROMPT = """คุณคือ Kru Rassamee (ครูรัศม�
 class ChatRequest(BaseModel):
     user_id: str
     message: str
+
+
+class SpeechRequest(BaseModel):
+    text: str
 
 @app.get("/")
 def root():
@@ -107,6 +117,30 @@ async def transcribe_audio(file: UploadFile = File(...)):
         raise
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Groq transcription failed: {e}")
+
+
+@app.post("/api/v1/agent/speak")
+async def speak_with_agent(req: SpeechRequest):
+    """Generate English teacher audio while keeping the Groq key server-side."""
+    if groq_client is None:
+        raise HTTPException(status_code=503, detail="GROQ_API_KEY is not configured")
+    if not req.text.strip():
+        raise HTTPException(status_code=400, detail="Speech text is required")
+
+    try:
+        speech = groq_client.audio.speech.create(
+            model=groq_tts_model,
+            voice=groq_tts_voice,
+            input=req.text[:4000],
+            response_format="wav",
+        )
+        return StreamingResponse(
+            BytesIO(speech.read()),
+            media_type="audio/wav",
+            headers={"Cache-Control": "no-store"},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Groq speech generation failed: {e}")
 
 if __name__ == "__main__":
     import uvicorn

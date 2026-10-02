@@ -5,6 +5,20 @@ import { REGIONAL_PHRASES_COLLECTION, THAI_SLANG_COLLECTION } from '../data/regi
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const AGENT_API_URL = import.meta.env.VITE_AGENT_API_URL || 'http://127.0.0.1:8000';
 
+export async function speakNinny(text: string): Promise<void> {
+  const response = await fetch(`${AGENT_API_URL}/api/v1/agent/speak`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  });
+
+  if (!response.ok) throw new Error('Teacher voice is unavailable');
+
+  const audio = new Audio(URL.createObjectURL(await response.blob()));
+  audio.onended = () => URL.revokeObjectURL(audio.src);
+  await audio.play();
+}
+
 export async function transcribeAudio(audio: Blob): Promise<string> {
   const formData = new FormData();
   formData.append('file', audio, 'rassa-recording.webm');

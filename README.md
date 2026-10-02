@@ -138,7 +138,7 @@ VITE_STRIPE_CHECKOUT_ENDPOINT=
 5. Groq Whisper returns text to the chat input.
 6. Send the text to Ninny AI for an English explanation and Thai guidance.
 
-Ninny teacher responses use an English female adult browser voice when available. Thai pronunciation buttons use a Thai voice separately. Browser voice names vary by operating system.
+Ninny teacher responses use Groq English TTS (`canopylabs/orpheus-v1-english`) with the `hannah` voice by default. Thai pronunciation buttons use a Thai browser voice separately. The browser voice is only a fallback when server-generated teacher audio is unavailable.
 
 ## API Endpoints
 
@@ -147,6 +147,7 @@ Ninny teacher responses use an English female adult browser voice when available
 | GET | `/` | Agent service health check |
 | POST | `/api/v1/agent/chat` | Server-side tutor response |
 | POST | `/api/v1/agent/transcribe` | Audio upload to Groq Whisper transcription |
+| POST | `/api/v1/agent/speak` | Generate English teacher audio with Groq TTS |
 
 ## Safety and Quality Rules
 
@@ -188,9 +189,11 @@ The repository includes `amplify.yml` for the Vite frontend and `Dockerfile` for
 1. Create an App Runner service from the GitHub repository or a container image.
 2. Build from the included `Dockerfile`.
 3. Set the application port to `8000`.
-4. Store `GROQ_API_KEY`, `GROQ_TRANSCRIPTION_MODEL`, `GEMINI_API_KEY`, and Google Cloud values in AWS Secrets Manager.
+4. Store `GROQ_API_KEY`, `GROQ_TRANSCRIPTION_MODEL`, `GROQ_TTS_MODEL`, `GROQ_TTS_VOICE`, `GEMINI_API_KEY`, and Google Cloud values in AWS Secrets Manager.
 5. Configure the production Amplify URL in the FastAPI CORS allow-list before public launch.
 6. Copy the App Runner service URL into Amplify as `VITE_AGENT_API_URL` and redeploy.
+
+Set `CORS_ORIGINS` in App Runner to the deployed Amplify URL, for example `https://main.xxxxx.amplifyapp.com`.
 
 See [docs/rassa-blueprint-implementation-status.md](docs/rassa-blueprint-implementation-status.md) and [docs/go-to-market-readiness-audit-2026-09-26.md](docs/go-to-market-readiness-audit-2026-09-26.md) for the current launch assessment.
 

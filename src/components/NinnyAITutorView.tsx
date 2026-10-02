@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import {
   NINNY_ROLEPLAY_SCENARIOS,
   askNinnyAI,
+  speakNinny,
 } from '../services/ninnyAi';
 import type { RolePlayScenario, ChatMessage } from '../types/rassa';
 import {
@@ -87,7 +88,7 @@ What would you like to practise first?`,
         content: reply.text,
       };
       setMessages((prev) => [...prev, ninnyMsg]);
-      speakEnglish(reply.text);
+      speakNinny(reply.text).catch(() => speakEnglish(reply.text));
     } catch {
       const errorMsg: ChatMessage = {
         id: `err-${Date.now()}`,
