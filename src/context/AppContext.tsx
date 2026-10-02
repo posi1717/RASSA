@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { UserProfile, SubscriptionTier, Lesson } from '../types/rassa';
 import { localStore, type SavedVocabItem } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
+import type { User } from '@supabase/supabase-js';
 import { LESSONS_DATABASE } from '../data/curriculum';
 
 export type AppView =
@@ -39,6 +41,11 @@ interface AppContextType {
   isFeedbackModalOpen: boolean;
   setIsFeedbackModalOpen: (open: boolean) => void;
   speakThai: (text: string) => void;
+  speakEnglish: (text: string) => void;
+  authUser: User | null;
+  isAuthModalOpen: boolean;
+  setIsAuthModalOpen: (open: boolean) => void;
+  signOut: () => Promise<void>;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -78,6 +85,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authUser, setAuthUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!supabase) return;
+    void supabase.auth.getUser().then(({ data }) => setAuthUser(data.user));
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthUser(session?.user ?? null);
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  const signOut = async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    setAuthUser(null);
+  };
 
   useEffect(() => {
     localStore.setSubscriptionTier(subscriptionTier);
@@ -136,7 +160,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'th-TH';
-      utterance.rate = 0.85; // Slightly slower for clear pedagogical listening
+      utterance.rate = 0.9;
+      utterance.pitch = 1.05;
+
+      const voices = window.speechSynthesis.getVoices();
+      const thaiVoices = voices.filter((voice) => voice.lang.toLowerCase().startsWith('th'));
+      const femaleVoice = thaiVoices.find((voice) =>
+        /female|woman|premwada|kanya|nattaya|google/i.test(voice.name)
+      );
+      utterance.voice = femaleVoice || thaiVoices[0] || voices.find((voice) => voice.lang.startsWith('en')) || null;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const speakEnglish = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-GB';
+      utterance.rate = 0.94;
+      utterance.pitch = 1.04;
+
+      const voices = window.speechSynthesis.getVoices();
+      const EnglishVoices = voices.filter((voice) => /^en(-|_)/i.test(voice.lang));
+      const femaleVoice = EnglishVoices.find((voice) =>
+        /female|woman|susan|samantha|sara|libby|hazel|google uk english/i.test(voice.name)
+      );
+      utterance.voice = femaleVoice || EnglishVoices.find((voice) => /GB|UK/i.test(voice.lang)) || EnglishVoices[0] || null;
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -169,6 +219,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isFeedbackModalOpen,
         setIsFeedbackModalOpen,
         speakThai,
+        speakEnglish,
+        authUser,
+        isAuthModalOpen,
+        setIsAuthModalOpen,
+        signOut,
       }}
     >
       {children}

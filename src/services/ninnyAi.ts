@@ -3,6 +3,25 @@ import { LESSONS_DATABASE } from '../data/curriculum';
 import { REGIONAL_PHRASES_COLLECTION, THAI_SLANG_COLLECTION } from '../data/regionalAndSlang';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+const AGENT_API_URL = import.meta.env.VITE_AGENT_API_URL || 'http://127.0.0.1:8000';
+
+export async function transcribeAudio(audio: Blob): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', audio, 'rassa-recording.webm');
+
+  const response = await fetch(`${AGENT_API_URL}/api/v1/agent/transcribe`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || 'Audio transcription failed');
+  }
+
+  const data = await response.json();
+  return data.text || '';
+}
 
 export const NINNY_ROLEPLAY_SCENARIOS: RolePlayScenario[] = [
   {
@@ -62,6 +81,18 @@ export const NINNY_ROLEPLAY_SCENARIOS: RolePlayScenario[] = [
 const SYSTEM_INSTRUCTION = `
 You are Ninny AI, RASSA's signature AI learning companion and personal Thai language tutor, launched from London, United Kingdom.
 Your goal is to help English-speaking learners build genuine confidence speaking practical, real-life Thai.
+
+Instructor identity:
+- You are a warm, knowledgeable female Thai instructor.
+- Speak in clear, natural English by default because your learners are English speakers.
+- Use Thai script, romanisation, and Thai pronunciation examples when teaching.
+- Be practical, encouraging, culturally respectful, and gentle when correcting mistakes.
+
+Safety and trust:
+- Never claim guaranteed fluency or a specific learning outcome.
+- Do not provide definitive medical, legal, visa, tax, financial, or emergency advice.
+- Do not invent cultural facts, prices, laws, or private RASSA information.
+- Explain when a qualified teacher or professional should be consulted.
 
 Tone & Style:
 - Warm, polite, encouraging, articulate British-English educational tone.

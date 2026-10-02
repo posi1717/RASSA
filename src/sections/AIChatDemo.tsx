@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { User, Send, Sparkles, ArrowRight } from 'lucide-react';
+import { User, Send, Sparkles, ArrowRight, Mic, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { askNinnyAI } from '../services/ninnyAi';
+import { askNinnyAI, transcribeAudio } from '../services/ninnyAi';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -60,6 +60,10 @@ const AIChatDemo: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [isTyping, setIsTyping] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordingChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -120,6 +124,45 @@ const AIChatDemo: React.FC = () => {
   const handleOpenFullTutor = () => {
     const event = new CustomEvent('open-ninny-tutor');
     window.dispatchEvent(event);
+  };
+
+  const handleToggleRecording = async () => {
+    if (isRecording && mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      setInputValue('เสียงไม่รองรับในเบราว์เซอร์นี้ กรุณาพิมพ์ข้อความแทน');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      recordingChunksRef.current = [];
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) recordingChunksRef.current.push(event.data);
+      };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+        setIsTranscribing(true);
+        try {
+          const text = await transcribeAudio(new Blob(recordingChunksRef.current, { type: recorder.mimeType }));
+          setInputValue(text);
+        } catch (error) {
+          setInputValue(error instanceof Error ? error.message : 'ถอดเสียงไม่สำเร็จ');
+        } finally {
+          setIsTranscribing(false);
+        }
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsRecording(true);
+    } catch {
+      setInputValue('ไม่สามารถเข้าถึงไมโครโฟนได้ กรุณาอนุญาตการใช้งานไมโครโฟน');
+    }
   };
 
   return (
@@ -228,6 +271,16 @@ const AIChatDemo: React.FC = () => {
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 className="flex-1 bg-[#1f1f1f] border border-neutral-700 rounded-2xl px-4 py-3 text-xs sm:text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#ff3a1f]"
               />
+              <Button
+                type="button"
+                onClick={handleToggleRecording}
+                disabled={isTranscribing}
+                title={isRecording ? 'หยุดบันทึกเสียง' : 'บันทึกเสียง'}
+                aria-label={isRecording ? 'หยุดบันทึกเสียง' : 'บันทึกเสียง'}
+                className={`${isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-[#242424] hover:bg-[#303030]'} text-white px-4 rounded-2xl`}
+              >
+                {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </Button>
               <Button
                 onClick={handleSend}
                 className="bg-[#ff3a1f] hover:bg-[#d82a12] text-white px-5 rounded-2xl"

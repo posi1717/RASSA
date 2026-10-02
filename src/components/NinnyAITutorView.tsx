@@ -24,6 +24,7 @@ export const NinnyAITutorView: React.FC = () => {
     aiMessageCount,
     incrementAIMessageCount,
     speakThai,
+    speakEnglish,
   } = useApp();
 
   const isPaid = subscriptionTier === 'monthly' || subscriptionTier === 'yearly';
@@ -86,6 +87,7 @@ What would you like to practise first?`,
         content: reply.text,
       };
       setMessages((prev) => [...prev, ninnyMsg]);
+      speakEnglish(reply.text);
     } catch {
       const errorMsg: ChatMessage = {
         id: `err-${Date.now()}`,

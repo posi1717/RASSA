@@ -109,3 +109,13 @@ The initial 390px smoke test measured `body.scrollWidth` 417px against a 391px v
 - `src/sections/AIChatDemo.tsx`: landing demo now calls the same tutor service.
 - `src/supabase/schema.sql`: corrected row ownership policies.
 - `src/index.css`: prevented mobile horizontal overflow.
+
+## Google Cloud Agent Service Update (2026-10-01)
+
+- ADC authentication: **PASS**.
+- Project access: **PASS** for `rassame` / `733979547417`.
+- ADC quota project: **PASS**, set to `rassame`.
+- Backend health endpoint: **PASS** at local `/`.
+- Google Cloud model smoke test: **BLOCKED by `BILLING_DISABLED`** on `aiplatform.googleapis.com`.
+
+The backend now uses ADC through Vertex AI when no server-side `GEMINI_API_KEY` is present, defaults to `gemini-3.8-flash`, and reads `GOOGLE_CLOUD_LOCATION=global`. Enable billing on `rassame`, wait for propagation, then rerun the one-message smoke test before exposing the tutor publicly.

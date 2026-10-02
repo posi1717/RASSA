@@ -1,73 +1,186 @@
-# React + TypeScript + Vite
+# RASSA
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+RASSA is a London-launched learning platform for English-speaking learners who want practical Thai language and cultural confidence.
 
-Currently, two official plugins are available:
+The first commercial product is **RASSA Thai**, supported by **Ninny AI**: a warm Thai tutor who explains Thai in clear English, teaches real-life phrases, corrects mistakes gently, and provides cultural context.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Product Promise
 
-## React Compiler
+> Learn practical Thai. Speak with confidence.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+RASSA teaches what to say, how to say it, and when to use it in real situations such as food stalls, markets, taxis, hotels, introductions, and everyday conversation.
 
-## Expanding the ESLint configuration
+## Phase 1 Scope
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Thai foundations: pronunciation, tones, script, greetings, numbers, and core grammar
+- Everyday Thai: requests, shopping, food, transport, directions, and social conversation
+- Travel Thai: airports, hotels, restaurants, taxis, and useful local phrases
+- Thai politeness: khráp, khâ, forms of address, wai etiquette, and social context
+- Spoken Thai: natural daily phrases, selected slang, and regional expressions
+- Ninny AI: English explanations, translation, correction, role-play, and practice
+- Progress tracking, saved vocabulary, free preview, and paid access points
+- Voice input through Groq Whisper and browser-based teacher pronunciation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Subscription Positioning
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+| Plan | Price | Access |
+| --- | ---: | --- |
+| Free Preview | GBP 0 | Selected lessons and limited AI practice |
+| Monthly | GBP 19.60/month | Full Thai curriculum and extended Ninny AI access |
+| Yearly | GBP 190.60/year | Full access with annual billing value |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## System Architecture
+
+```text
+React + TypeScript + Vite frontend
+          |
+          +-- RASSA lesson and knowledge library
+          +-- Browser microphone capture
+          +-- Browser speech synthesis
+          |
+FastAPI agent service
+          |
+          +-- Groq Whisper: audio to text
+          +-- Google Gemini / Vertex AI: tutor response
+          +-- Supabase: auth, progress, saved vocabulary, chat data
+          +-- Stripe: checkout and subscription management
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Repository Layout
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+app/
+  src/
+    components/       Learning views and tutor UI
+    data/              Curriculum, slang, and regional Thai content
+    services/          AI, transcription, Stripe, and data services
+    context/           Application state and voice helpers
+    sections/          Landing page sections
+  agent_service.py    Server-side AI and transcription API
+  requirements.txt    Python backend dependencies
+  .env.example        Environment variable template
+  docs/               Audit and launch-readiness documents
 ```
+
+## Requirements
+
+- Node.js 20 or newer
+- Python 3.11 or newer
+- A modern browser with microphone support for voice input
+- Supabase is optional for local demo mode
+- Google Cloud billing is required for live Vertex AI calls
+
+## Local Setup
+
+From this directory:
+
+```powershell
+npm install
+Copy-Item .env.example .env
+```
+
+Add secrets to `.env`. Keep this file local and never commit it.
+
+### Start the Agent Service
+
+Create or activate the repository virtual environment, then install backend dependencies:
+
+```powershell
+..\.venv\Scripts\python.exe -m pip install -r requirements.txt
+..\.venv\Scripts\python.exe -m uvicorn agent_service:app --reload --port 8000
+```
+
+Health check:
+
+```text
+http://127.0.0.1:8000/
+```
+
+### Start the Frontend
+
+In a second terminal:
+
+```powershell
+npm run dev
+```
+
+Open the Vite URL shown in the terminal, normally `http://localhost:5173`.
+
+## Environment Variables
+
+The important server-side values are:
+
+```env
+GOOGLE_CLOUD_PROJECT_ID=rassame
+GOOGLE_CLOUD_LOCATION=global
+GEMINI_MODEL=gemini-3.8-flash
+GROQ_API_KEY=
+GROQ_TRANSCRIPTION_MODEL=whisper-large-v3-turbo
+```
+
+`GROQ_API_KEY`, `GEMINI_API_KEY`, Google credentials, Supabase service keys, and Stripe secrets must remain server-side. Do not rename them with the `VITE_` prefix.
+
+The frontend uses:
+
+```env
+VITE_AGENT_API_URL=http://127.0.0.1:8000
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_STRIPE_CHECKOUT_ENDPOINT=
+```
+
+## Voice Flow
+
+1. Select the microphone button in the tutor interface.
+2. Speak naturally in English or Thai.
+3. Stop recording.
+4. The recording is sent to `/api/v1/agent/transcribe`.
+5. Groq Whisper returns text to the chat input.
+6. Send the text to Ninny AI for an English explanation and Thai guidance.
+
+Ninny teacher responses use an English female adult browser voice when available. Thai pronunciation buttons use a Thai voice separately. Browser voice names vary by operating system.
+
+## API Endpoints
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/` | Agent service health check |
+| POST | `/api/v1/agent/chat` | Server-side tutor response |
+| POST | `/api/v1/agent/transcribe` | Audio upload to Groq Whisper transcription |
+
+## Safety and Quality Rules
+
+Ninny AI should:
+
+- Explain Thai in clear, natural English by default.
+- Include Thai script, romanisation, meaning, politeness, and cultural context when useful.
+- Correct learners gently and avoid stereotypes.
+- Avoid definitive medical, legal, visa, tax, financial, and emergency advice.
+- Never reveal API keys, private user data, or internal business information.
+- State when a qualified teacher or professional is needed.
+
+## Go-to-Market Readiness
+
+Before public paid traffic:
+
+1. Enable and verify Google Cloud billing for project `rassame`, or use a supported paid AI backend.
+2. Move all production AI calls behind the server-side agent service.
+3. Configure live Stripe products, checkout, webhook verification, refunds, and customer portal.
+4. Add production CORS origins, authentication, rate limits, spend limits, and structured logs.
+5. Test microphone permissions and transcription on Chrome, Safari, and mobile.
+6. Publish privacy, terms, acceptable-use, and refund policies.
+7. Run a small free-preview pilot and measure activation, lesson completion, AI usage, audio success, conversion intent, and support issues.
+
+See [docs/rassa-blueprint-implementation-status.md](docs/rassa-blueprint-implementation-status.md) and [docs/go-to-market-readiness-audit-2026-09-26.md](docs/go-to-market-readiness-audit-2026-09-26.md) for the current launch assessment.
+
+## Development Checks
+
+```powershell
+npm run lint
+npm run build
+..\.venv\Scripts\python.exe -m py_compile agent_service.py
+```
+
+## Product Direction
+
+Phase 1 focuses on practical Thai. Later phases can expand into Thailand travel and culture, food and wellness, real instructors, communities, and Thailand business learning. AI supports those human relationships; it does not replace qualified teachers or real-world experience.
