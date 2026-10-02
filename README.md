@@ -171,6 +171,27 @@ Before public paid traffic:
 6. Publish privacy, terms, acceptable-use, and refund policies.
 7. Run a small free-preview pilot and measure activation, lesson completion, AI usage, audio success, conversion intent, and support issues.
 
+## AWS Deployment
+
+The repository includes `amplify.yml` for the Vite frontend and `Dockerfile` for the FastAPI agent service.
+
+### Frontend: AWS Amplify
+
+1. Connect the GitHub repository in AWS Amplify Hosting.
+2. Set the app root to `app` if the repository is checked out from the monorepo root.
+3. Use the included `amplify.yml` build settings.
+4. Add `VITE_AGENT_API_URL` with the public App Runner URL.
+5. Add Supabase public URL and anon key if cloud sync is enabled.
+
+### Backend: AWS App Runner
+
+1. Create an App Runner service from the GitHub repository or a container image.
+2. Build from the included `Dockerfile`.
+3. Set the application port to `8000`.
+4. Store `GROQ_API_KEY`, `GROQ_TRANSCRIPTION_MODEL`, `GEMINI_API_KEY`, and Google Cloud values in AWS Secrets Manager.
+5. Configure the production Amplify URL in the FastAPI CORS allow-list before public launch.
+6. Copy the App Runner service URL into Amplify as `VITE_AGENT_API_URL` and redeploy.
+
 See [docs/rassa-blueprint-implementation-status.md](docs/rassa-blueprint-implementation-status.md) and [docs/go-to-market-readiness-audit-2026-09-26.md](docs/go-to-market-readiness-audit-2026-09-26.md) for the current launch assessment.
 
 ## Development Checks
