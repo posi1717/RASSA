@@ -27,16 +27,3 @@ dist-ssr
 .env
 .env.*
 !.env.example
-
-# Local agent/tooling artifacts
-.agents/
-.aider-desk/
-.augment/
-.autohand/
-.claude/
-.codeartsdoer/
-skills/
-skills-lock.json
-__pycache__/
-test_gemini.py
-src/sections/Untitled-1.txt
